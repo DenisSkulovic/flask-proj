@@ -1,28 +1,12 @@
 from flask import Flask
 from flask import request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.config
 
-test = [
-    {
-        "id": 1,
-        "bitch": True,
-        "ass": True,
-    },
-    {
-        "id": 2
-    },
-    {
-        "id": 3
-    }
-]
-
-
-@app.route('/', methods=["GET"])
-def hello_world():
-    return jsonify(test)
+db = SQLAlchemy(app)
 
 
 @app.errorhandler(404)
