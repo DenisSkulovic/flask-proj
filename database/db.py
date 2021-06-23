@@ -1,10 +1,9 @@
-# import os
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, String, MetaData
 
-# db_string = os.environ.get("DATABASE_URL")
-db_string = "postgresql://postgres:postgres@localhost:5432/flask_proj"
+db_string = os.environ.get("DATABASE_URL")
 
 db = create_engine(db_string)
 
