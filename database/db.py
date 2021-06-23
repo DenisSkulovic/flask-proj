@@ -1,29 +1,38 @@
-from app import db
-from sqlalchemy.dialects.postgresql import JSON
+# import os
 
+from sqlalchemy import create_engine
+from sqlalchemy import Table, Column, String, MetaData
 
-class People(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    pname = db.Column(db.String(80), unique=True, nullable=False)
-    color = db.Column(db.String(120), nullable=False)
+# db_string = os.environ.get("DATABASE_URL")
+db_string = "postgresql://postgres:postgres@localhost:5432/flask_proj"
 
-    def __init__(self, pname, color):
-        self.pname = pname
-        self.color = color
+db = create_engine(db_string)
 
+meta = MetaData(db)
+film_table = Table('films', meta,
+                   Column('title', String),
+                   Column('director', String),
+                   Column('year', String))
 
-class Result(db.Model):
-    __tablename__ = 'results'
+with db.connect() as conn:
 
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String())
-    result_all = db.Column(JSON)
-    result_no_stop_words = db.Column(JSON)
+    # Create
+    film_table.create()
+    insert_statement = film_table.insert().values(
+        title="Doctor Strange", director="Scott Derrickson", year="2016")
+    conn.execute(insert_statement)
 
-    def __init__(self, url, result_all, result_no_stop_words):
-        self.url = url
-        self.result_all = result_all
-        self.result_no_stop_words = result_no_stop_words
+    # Read
+    select_statement = film_table.select()
+    result_set = conn.execute(select_statement)
+    for r in result_set:
+        print(r)
 
-    def __repr__(self):
-        return '<id {}>'.format(self.id)
+    # Update
+    update_statement = film_table.update().where(
+        film_table.c.year == "2016").values(title="Some2016Film")
+    conn.execute(update_statement)
+
+    # Delete
+    delete_statement = film_table.delete().where(film_table.c.year == "2016")
+    conn.execute(delete_statement)
